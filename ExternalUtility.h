@@ -227,5 +227,7 @@ namespace GOTHIC_ENGINE
 
 			inline static Container s_objects;
 		};
+
+
 	}
 }

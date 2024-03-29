@@ -1,9 +1,11 @@
 // Supported with union (c) 2020 Union team
 // Union HEADER file
+#include <list>
+#include <concepts>
 
 #define MakeDaedalusExternal(function) Externals::DaedalusExternal<#function,function>
 #define MakeDaedalusExternalWithCondition(function, condition) Externals::DaedalusExternal<#function,function,condition>
-#include <list>
+
 namespace GOTHIC_ENGINE
 {
 	enum class eParser
@@ -24,15 +26,17 @@ namespace GOTHIC_ENGINE
 		struct ExternalTable<ParserEnum>\
 		{\
 			static constexpr const auto s_parser = ParserEnum; \
-			using Table = std::tuple\
+			using Table = ExternalsTuple\
 			<\
 			__VA_ARGS__\
 			>; \
 		}; \
 	}\
 
+
+
 	namespace Externals
-	{
+	{	
 		struct DaedalusFunction 
 		{
 			int m_index{ -1 };
@@ -273,17 +277,44 @@ namespace GOTHIC_ENGINE
 			}
 		};
 
+		template<typename T1, typename T2>
+		constexpr bool ExternalSameAs()
+		{
+			return T1::s_name.Data() == T2::s_name.Data();
+		}
+
+		template<typename T, typename... Types>
+		constexpr bool are_externals_unique_v = ((!ExternalSameAs<T, Types>()) && ...) && are_externals_unique_v<Types...>;
+
+		template<typename T>
+		constexpr bool are_externals_unique_v<T> = true;
+
+		template <typename T, typename... Ts>
+		constexpr bool are_base_of_v = (std::is_base_of_v<T, Ts> && ...);
+
+		template<typename...Args>
+			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal,Args...>)
+		struct ExternalsTuple
+		{
+			using Type = std::tuple<Args...>;
+		};
+
 		template<eParser Parser>
 		struct ExternalTable
 		{
 			static constexpr const auto s_parser = Parser;
 
-			using Table = std::tuple
+			using Table = ExternalsTuple
 				<
 				BaseExternal
 				>;
 
 		};
+
+		template<size_t N> 
+			requires(N < std::to_underlying(eParser::MAX))
+		using NthTable = ExternalTable<static_cast<eParser>(N)>;
+
 
 	}
 }
