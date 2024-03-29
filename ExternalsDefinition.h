@@ -16,11 +16,6 @@ namespace GOTHIC_ENGINE
 		template<typename T1, typename T2>
 		constexpr bool ExternalSameAs()
 		{
-			if (!std::is_same_v<T1, T2>)
-			{
-				return false;
-			}
-
 			return T1::s_name.Data() == T2::s_name.Data();
 		}
 
