@@ -119,8 +119,8 @@ int Npc_DoTakeItem()
 {
 	auto const par = zCParser::GetParser();
 
-	oCItem* item;
 	oCNpc* npc;
+	oCItem* item;
 
 	//all arguments must be popped in a reverse order
 	item = static_cast<oCItem*>(par->GetInstance());
