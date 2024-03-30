@@ -136,6 +136,30 @@ int Npc_DoTakeItem()
 	return 0;
 }
 
+int EXT_RGBA()
+{
+	auto const par = zCParser::GetParser();
+
+	int r, g, b, a;
+
+	par->GetParameter(a);
+	par->GetParameter(b);
+	par->GetParameter(g);
+	par->GetParameter(r);
+
+	const zCOLOR color
+	{
+		static_cast<unsigned char>(r),
+		static_cast<unsigned char>(g),
+		static_cast<unsigned char>(b),
+		static_cast<unsigned char>(a)
+	};
+
+	par->SetReturn(static_cast<int>(color.dword));
+
+	return 0;
+}
+
 //hooked engine function
 void Game_DefineExternals()
 {
@@ -148,6 +172,8 @@ void Game_DefineExternals()
 	{
 		parser->DefineExternal("Npc_DoTakeItem", Npc_DoTakeItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_INSTANCE, 0);
 	}
+
+	menuParser->DefineExternal("EXT_RGBA", EXT_RGBA, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, 0);
 }
 
 ```
