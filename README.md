@@ -24,7 +24,7 @@ BetterExternals.h:
 ```
 Your code e.g.in MyExternals.h
 ```cpp
-int EXT_Log_GetTopicStatus(const zSTRING & t_topicName)
+int EXT_Log_GetTopicStatus(const zSTRING& t_topicName)
 {
 	auto list = oCLogManager::GetLogManager().m_lstTopics.next;
 	while (list)
@@ -41,7 +41,7 @@ int EXT_Log_GetTopicStatus(const zSTRING & t_topicName)
 	return static_cast<int>(oCLogTopic::zELogTopicStatus_Free);
 }
 
-void Npc_DoTakeItem(oCNpc * t_npc, oCItem * t_item)
+void Npc_DoTakeItem(oCNpc* t_npc, oCItem* t_item)
 {
 	if (!t_npc || !t_item)
 	{
