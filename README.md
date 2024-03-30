@@ -104,8 +104,8 @@ int Npc_DoTakeItem()
 	oCNpc* npc;
 
 	//all arguments must be popped in a reverse order
-	item = reinterpret_cast<oCItem*>(par->GetInstance());
-	npc = reinterpret_cast<oCNpc*>(par->GetInstance());
+	item = static_cast<oCItem*>(par->GetInstance());
+	npc = static_cast<oCNpc*>(par->GetInstance());
 
 	//you have to pop every argument before return
 	if (!item || !npc)
