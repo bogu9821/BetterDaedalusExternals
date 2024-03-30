@@ -19,11 +19,11 @@ namespace GOTHIC_ENGINE
 				auto Declare = [] <std::size_t... Is2>(const auto table, std::index_sequence<Is2...>)
 				{
 					const auto par = GetParserByEnum(table.s_parser);
-					((std::tuple_element_t<Is2, typename decltype(table)::Table::Type>::DefineExternal(par)), ...);
+					((std::tuple_element_t<Is2, typename decltype(table)::Table>::DefineExternal(par)), ...);
 				};
 
 				(Declare(NthTable<Is>{}, std::make_index_sequence<
-					std::tuple_size_v<typename NthTable<Is>::Table::Type>>{}
+					std::tuple_size_v<typename NthTable<Is>::Table>>{}
 				), ...);
 
 			}(std::make_index_sequence<std::to_underlying(eParser::MAX)>());

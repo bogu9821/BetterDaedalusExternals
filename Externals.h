@@ -301,10 +301,7 @@ namespace GOTHIC_ENGINE
 
 		template<typename...Args>
 			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal,Args...>)
-		struct ExternalsTuple
-		{
-			using Type = std::tuple<Args...>;
-		};
+		using ExternalsTuple = std::tuple<Args...>;
 
 		template<eParser Parser>
 		struct ExternalTable
