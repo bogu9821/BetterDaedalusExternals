@@ -202,13 +202,20 @@ namespace GOTHIC_ENGINE
 		template<FixedStr Name, auto Callable, auto ConditionFunc = nullptr>
 		struct DaedalusExternal : public BaseExternal
 		{
+			using CallableType = decltype(Callable);
+			using NameType = decltype(Name);
+
 			using Type = DaedalusExternal<Name, Callable, ConditionFunc>;
 
-			static constexpr decltype(Name) s_name = Name;
-			static constexpr decltype(Callable) s_callable = Callable;
+			static constexpr bool IsFunctionPointer = std::is_pointer_v<CallableType>
+				&& std::is_function_v<typename std::remove_pointer_t<CallableType>>;
 
-			using CallableInfo = FunctionTraits<decltype(Callable)>;
+			using CallableInfo = FunctionTraits<std::conditional_t<IsFunctionPointer, CallableType, decltype(+Callable)>>;
 			using ReturnType = CallableInfo::ReturnType;
+	
+
+			static constexpr NameType s_name = Name;
+			static constexpr CallableType s_callable = Callable;
 
 			static bool Condition()
 			{
@@ -265,7 +272,7 @@ namespace GOTHIC_ENGINE
 				{
 					[t_parser] <std::size_t... Is>(std::index_sequence<Is...>)
 					{
-						t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, TypeToEnum<std::decay_t<ReturnType>>(), TypeToEnum<std::decay_t<std::tuple_element_t<Is, CallableInfo::ArgTypes>>>()..., 0);
+						t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, TypeToEnum<std::decay_t<ReturnType>>(), TypeToEnum<std::decay_t<std::tuple_element_t<Is, typename CallableInfo::ArgTypes>>>()..., 0);
 
 					}(std::make_index_sequence<CallableInfo::ArgCount>());
 
