@@ -2,7 +2,7 @@
 Improved method for creating C++ externals for the Daedalus scripting language.Requires C++23. <br>
 Thanks to C++ templates and constexpr, you no longer need to define external types yourself or call parser methods to handle arguments from the stack or return values. <br>
 This simplifies code writing and reduces the errors.
-Compile - time errors occur if you attempt to redefine an external.<br>
+Compile time errors occur if you attempt to redefine an external.<br>
 There are many errors in the engine with returning values in void functions, which may cause stack overflow.<br>
 Additionally, zSTRING externals have a pooled return value and you don't have to return static variables.<br>
 zSTRINGs can be also taken from the stack as const references, eliminating the need for copying.<br>
