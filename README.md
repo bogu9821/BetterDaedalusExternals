@@ -90,7 +90,7 @@ int Log_GetTopicStatus()
 		list = list->next;
 	}
 
-	//you have to remember to call zCParser::SetReturn before every return of C++ the function
+	//you have to remember to call zCParser::SetReturn before every return of a C++ function.
 	par->SetReturn(static_cast<int>(oCLogTopic::zELogTopicStatus_Free));
 	return 0;
 };
