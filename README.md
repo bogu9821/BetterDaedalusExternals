@@ -78,7 +78,8 @@ zSTRING GetHeroName()
 
 ExternalDefinition(eParser::GAME,
 	MakeDaedalusExternal(EXT_Log_GetTopicStatus),
-	MakeDaedalusExternalWithCondition(GetHeroName, []() -> bool { return (rand() % 2) == 1; })
+	MakeDaedalusExternal(GetHeroName),
+	MakeDaedalusExternalWithCondition(Npc_DoTakeItem, []() -> bool { return (rand() % 2) == 1; })
 )
 
 ExternalDefinition(eParser::MENU, MakeDaedalusExternal(EXT_RGBA))
