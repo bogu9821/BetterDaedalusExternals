@@ -5,7 +5,8 @@ This simplifies code writing and reduces the errors.
 Compile - time errors occur if you attempt to redefine an external.<br>
 There are many errors in the engine with returning values in void functions, which may cause stack overflow.<br>
 Additionally, zSTRING externals have a pooled return value and you don't have to return static variables.<br>
-zSTRINGs can be also taken from the stack as const references, eliminating the need for copying.
+zSTRINGs can be also taken from the stack as const references, eliminating the need for copying.<br>
+The name of the external function will be taken from the name of the function/lambda.
 
 # Example
 To ensure everything works properly, make sure to include BetterExternals.h in your project and place your external header before ExternalsDefinition.h in that file due to constexpr checks.
