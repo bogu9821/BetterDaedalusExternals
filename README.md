@@ -1,8 +1,8 @@
 # BetterDaedalusExternals
-Improved method for creating C++ externals for the Daedalus scripting language. Requires C++23.<br>
+Improved method for creating C++ externals for the Daedalus scripting language.Requires C++23. < br >
 Thanks to C++ templates and constexpr, you no longer need to define external types yourself or call parser methods to handle arguments from the stack or return values. <br>
 This simplifies code writing and reduces the errors.
-Compile-time errors occur if you attempt to redefine an external.<br>
+Compile - time errors occur if you attempt to redefine an external.<br>
 There are many errors in the engine with returning values in void functions, which may cause stack overflow.<br>
 Additionally, zSTRING externals have a pooled return value and you don't have to return static variables.<br>
 zSTRINGs can be also taken from the stack as const references, eliminating the need for copying.
@@ -21,49 +21,66 @@ BetterExternals.h:
 
 #include "ExternalsDefinition.h"
 ```
-Your code e.g. in MyExternals.h
-```c++  
-    int EXT_RGBA(const int r, const int g, const int b, const int a)
-    {
-        const zCOLOR color
-        {
-            static_cast<unsigned char>(r),
-            static_cast<unsigned char>(g),
-            static_cast<unsigned char>(b),
-            static_cast<unsigned char>(a)
-        };
+Your code e.g.in MyExternals.h
+```cpp
+int EXT_Log_GetTopicStatus(const zSTRING & t_topicName)
+{
+	auto list = oCLogManager::GetLogManager().m_lstTopics.next;
+	while (list)
+	{
+		auto const log = list->data;
+		if (log->m_strDescription == t_topicName)
+		{
+			return static_cast<int>(log->m_enuStatus);
+		}
 
-        return static_cast<int>(color.dword);
-    }
+		list = list->next;
+	}
 
-    int EXT_Log_GetTopicStatus(const zSTRING& t_topicName)
-    {
-        auto list = oCLogManager::GetLogManager().m_lstTopics.next;
-        while (list)
-        {
-            auto const log = list->data;
-            if (log->m_strDescription == t_topicName)
-            {
-                return static_cast<int>(log->m_enuStatus);
-            }
+	return static_cast<int>(oCLogTopic::zELogTopicStatus_Free);
+}
 
-            list = list->next;
-        }
+void Npc_DoTakeItem(oCNpc * t_npc, oCItem * t_item)
+{
+	if (!t_npc || !t_item)
+	{
+		return;
+	}
 
-        return static_cast<int>(oCLogTopic::zELogTopicStatus_Free);
-    }
+	t_npc->DoTakeVob(t_item);
+}
 
-    zSTRING GetHeroName()
-    {
-        return player->name[0];
-    }
-    
-    ExternalDefinition(eParser::GAME, 
-        MakeDaedalusExternal(EXT_Log_GetTopicStatus),
-        MakeDaedalusExternalWithCondition(GetHeroName, []() -> bool { return (rand() % 2) == 1; })
-    )
+int EXT_RGBA(const int r, const int g, const int b, const int a)
+{
+	const zCOLOR color
+	{
+		static_cast<unsigned char>(r),
+		static_cast<unsigned char>(g),
+		static_cast<unsigned char>(b),
+		static_cast<unsigned char>(a)
+	};
 
-    ExternalDefinition(eParser::MENU, MakeDaedalusExternal(EXT_RGBA))
+	return static_cast<int>(color.dword);
+}
+
+ExternalDefinition(eParser::GAME,
+	MakeDaedalusExternal(EXT_Log_GetTopicStatus),
+	MakeDaedalusExternal(GetHeroName),
+	MakeDaedalusExternalWithCondition(Npc_DoTakeItem, []() -> bool { return (rand() % 2) == 1; })
+)
+
+
+zSTRING GetHeroName()
+{
+	return player->name[0];
+}
+
+ExternalDefinition(eParser::GAME,
+	MakeDaedalusExternal(EXT_Log_GetTopicStatus),
+	MakeDaedalusExternalWithCondition(GetHeroName, []() -> bool { return (rand() % 2) == 1; })
+)
+
+ExternalDefinition(eParser::MENU, MakeDaedalusExternal(EXT_RGBA))
 ```
 
 # How it looked before
@@ -121,15 +138,15 @@ int Npc_DoTakeItem()
 //hooked engine function
 void Game_DefineExternals()
 {
-    //for every parser you have to define name, all script function types and return value
-    //it uses C va args so at the end must be 0
-    //if you will pop different type in your external you will get a crash
-    parser->DefineExternal("Log_GetTopicStatus", Log_GetTopicStatus, zPAR_TYPE_INT, zPAR_TYPE_STRING, 0);
+	//for every parser you have to define name, all script function types and return value
+	//it uses C va args so at the end must be 0
+	//if you will pop different type in your external you will get a crash
+	parser->DefineExternal("Log_GetTopicStatus", Log_GetTopicStatus, zPAR_TYPE_INT, zPAR_TYPE_STRING, 0);
 
-    if(condition)
-    {
-        menuParser->DefineExternal("Npc_DoTakeItem", Npc_DoTakeItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_INSTANCE, 0);
-    }
+	if ((rand() % 2) == 1)
+	{
+		parser->DefineExternal("Npc_DoTakeItem", Npc_DoTakeItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_INSTANCE, 0);
+	}
 }
 
 ```
