@@ -1,7 +1,7 @@
 # BetterDaedalusExternals
 Improved method of creating C++ externals for the Daedalus scripting language. <br>
 Thanks to C++ templates and constexpr, you no longer need to define external types yourself or call parser methods to handle arguments from the stack or return values. <br>
-This simplifies code writing and reduces the errors.
+This simplifies code writing and reduces the errors. I most cases the call to an external will be fully inlined and it won't have any overhead.
 Compile time errors occur if you attempt to redefine an external.<br>
 There are many errors in the engine with returning values in void functions, which may cause stack overflow.<br>
 Additionally, zSTRING externals have a pooled return value and you don't have to return static variables.<br>
