@@ -11,7 +11,7 @@ The name of the external function will be taken from the name of the function/la
 **Requires C++23 and is designed to work with Union 1.0m SDK.**
 
 # Example
-
+Include BetterDaedalusExternals.h and use macros for externals definition e.g.
 ```cpp
 int EXT_Log_GetTopicStatus(const zSTRING& t_topicName)
 {
@@ -52,13 +52,6 @@ int EXT_RGBA(const int r, const int g, const int b, const int a)
 
 	return static_cast<int>(color.dword);
 }
-
-ExternalDefinition(eParser::GAME,
-	MakeDaedalusExternal(EXT_Log_GetTopicStatus),
-	MakeDaedalusExternal(GetHeroName),
-	MakeDaedalusExternalWithCondition(Npc_DoTakeItem, []() -> bool { return (rand() % 2) == 1; })
-)
-
 
 zSTRING GetHeroName()
 {
