@@ -1,5 +1,5 @@
 # BetterDaedalusExternals
-Improved method for creating C++ externals for the Daedalus scripting language. <br>
+Improved method of creating C++ externals for the Daedalus scripting language. <br>
 Thanks to C++ templates and constexpr, you no longer need to define external types yourself or call parser methods to handle arguments from the stack or return values. <br>
 This simplifies code writing and reduces the errors.
 Compile time errors occur if you attempt to redefine an external.<br>
