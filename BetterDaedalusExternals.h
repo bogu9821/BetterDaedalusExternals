@@ -250,7 +250,7 @@ namespace GOTHIC_ENGINE
 		};
 
 
-		struct DaedalusFunction
+		struct DaedalusFunctionType
 		{
 			int m_index{ -1 };
 		};
@@ -258,7 +258,7 @@ namespace GOTHIC_ENGINE
 		template<typename T>
 		concept ScriptData =
 			std::is_same_v<std::decay_t<T>, int>
-			|| std::is_same_v<std::decay_t<T>, DaedalusFunction>
+			|| std::is_same_v<std::decay_t<T>, DaedalusFunctionType>
 			|| std::is_same_v<std::decay_t<T>, float>
 			|| std::is_same_v<std::decay_t<T>, zSTRING>
 			|| (std::is_pointer_v<std::decay_t<T>> && !std::is_pointer_v<std::remove_pointer_t<T>>);
@@ -266,7 +266,6 @@ namespace GOTHIC_ENGINE
 		template<typename T>
 		concept ScriptReturn =
 			std::is_same_v<T, int>
-			|| std::is_same_v<T, DaedalusFunction>
 			|| std::is_same_v<T, float>
 			|| std::is_same_v<T, zSTRING>
 			|| std::is_same_v<T, void>
@@ -306,7 +305,7 @@ namespace GOTHIC_ENGINE
 		template<ScriptData T>
 		inline constexpr auto GetData(zCParser* const t_parser)
 		{
-			if constexpr (std::is_same_v<T, int> || std::is_same_v<T, DaedalusFunction>)
+			if constexpr (std::is_same_v<T, int> || std::is_same_v<T, DaedalusFunctionType>)
 			{
 				int parameter;
 				t_parser->GetParameter(parameter);
@@ -330,13 +329,38 @@ namespace GOTHIC_ENGINE
 
 
 		template<ScriptReturn T>
+		inline constexpr int ReturnToEnum()
+		{
+			if constexpr (std::is_same_v<T, int>)
+			{
+				return zPAR_TYPE_INT;
+			}
+			else if constexpr (std::is_same_v<T, zSTRING>)
+			{
+				return zPAR_TYPE_STRING;
+			}
+			else if constexpr (std::is_same_v<T, float>)
+			{
+				return zPAR_TYPE_FLOAT;
+			}
+			else if constexpr (std::is_pointer_v<T>)
+			{
+				return zPAR_TYPE_INSTANCE;
+			}
+			else if constexpr (std::is_void_v<T>)
+			{
+				return zPAR_TYPE_VOID;
+			}
+		}
+
+		template<ScriptData T>
 		inline constexpr int TypeToEnum()
 		{
 			if constexpr (std::is_same_v<T, int>)
 			{
 				return zPAR_TYPE_INT;
 			}
-			else if constexpr (std::is_same_v<T, DaedalusFunction>)
+			else if constexpr (std::is_same_v<T, DaedalusFunctionType>)
 			{
 				return zPAR_TYPE_FUNC;
 			}
@@ -486,14 +510,14 @@ namespace GOTHIC_ENGINE
 				{
 					[t_parser] <std::size_t... Is>(std::index_sequence<Is...>)
 					{
-						t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, TypeToEnum<std::decay_t<ReturnType>>(), TypeToEnum<std::decay_t<std::tuple_element_t<Is, typename CallableInfo::ArgTypes>>>()..., 0);
+						t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, ReturnToEnum<std::decay_t<ReturnType>>(), TypeToEnum<std::decay_t<std::tuple_element_t<Is, typename CallableInfo::ArgTypes>>>()..., 0);
 
 					}(std::make_index_sequence<CallableInfo::ArgCount>());
 
 				}
 				else
 				{
-					t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, TypeToEnum<std::decay_t<ReturnType>>(), 0);
+					t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, ReturnToEnum<std::decay_t<ReturnType>>(), 0);
 				}
 			}
 		};
@@ -529,19 +553,19 @@ namespace GOTHIC_ENGINE
 					table->Define();
 				}
 			}
-			
+
 			inline static std::vector<BaseExternalTable*> s_tables;
 		};
 
 		template<typename... Args>
-			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal, Args...>)
+			requires (are_externals_unique_v<Args...>&& are_base_of_v<BaseExternal, Args...>)
 		struct ExternalTable final : public BaseExternalTable
 		{
 			ExternalTable(const eParser t_parserEnum, Args*... t_args)
 				: m_parser(GetParserByEnum(t_parserEnum))
 
 			{
-				((m_externals.push_back(t_args)),...);
+				((m_externals.push_back(t_args)), ...);
 			}
 
 			void Define() const override
@@ -566,7 +590,7 @@ namespace GOTHIC_ENGINE
 			std::vector<BaseExternal*> m_externals;
 			zCParser* m_parser;
 
-			
+
 		};
 
 
