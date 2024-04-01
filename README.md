@@ -1,12 +1,14 @@
 # BetterDaedalusExternals
-Improved method for creating C++ externals for the Daedalus scripting language.Requires C++23. <br>
+Improved method for creating C++ externals for the Daedalus scripting language. <br>
 Thanks to C++ templates and constexpr, you no longer need to define external types yourself or call parser methods to handle arguments from the stack or return values. <br>
 This simplifies code writing and reduces the errors.
 Compile time errors occur if you attempt to redefine an external.<br>
 There are many errors in the engine with returning values in void functions, which may cause stack overflow.<br>
 Additionally, zSTRING externals have a pooled return value and you don't have to return static variables.<br>
 zSTRINGs can be also taken from the stack as const references, eliminating the need for copying.<br>
-The name of the external function will be taken from the name of the function/lambda.
+The name of the external function will be taken from the name of the function/lambda.<br>
+
+**Requires C++23 and is designed to work with Union 1.0m SDK.**
 
 # Example
 To ensure everything works properly, make sure to include BetterExternals.h in your project and place your external header before ExternalsDefinition.h in that file due to constexpr checks.
