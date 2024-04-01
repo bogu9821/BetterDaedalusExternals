@@ -8,6 +8,8 @@ Additionally, zSTRING externals have a pooled return value and you don't have to
 zSTRINGs can be also taken from the stack as const references, eliminating the need for copying.<br>
 The name of the external function will be taken from the name of the function/lambda.<br>
 
+**NOTE: there can only be 1 table instance of a given parser.**
+
 **Requires C++23 and is designed to work with Union 1.0m SDK.**
 
 # Example
