@@ -14,8 +14,10 @@
 #define BetterDaedalusExternalWithCondition(function, condition) new BetterDaedalusExternals::DaedalusExternal<#function,function,condition>{}
 
 #define BetterExternalDefinition(parserEnum, ...)\
-inline const BetterDaedalusExternals::ExternalTable g_externalTable_##parserEnum{ BetterDaedalusExternals::eParser::parserEnum, __VA_ARGS__ }; \
-template<> struct BetterDaedalusExternals::ExternalTableGuard<BetterDaedalusExternals::eParser::parserEnum> {}\
+namespace BetterDaedalusExternals{\
+inline const ExternalTable g_externalTable_##parserEnum{ eParser::parserEnum, __VA_ARGS__ }; \
+template<> struct ExternalTableGuard<eParser::parserEnum> {};\
+}\
 
 
 namespace GOTHIC_ENGINE
@@ -593,11 +595,11 @@ namespace GOTHIC_ENGINE
 
 		};
 
-
 		template<eParser Parser>
 		struct ExternalTableGuard
 		{
 		};
+
 
 		void __fastcall zCPar_DataStack__Clear(zCPar_DataStack* t_this, void* t_reg);
 		inline HOOK Hook_zCPar_DataStack__Clear PATCH(&zCPar_DataStack::Clear, &zCPar_DataStack__Clear);
@@ -622,5 +624,4 @@ namespace GOTHIC_ENGINE
 			StringPool::ClearPool(t_this);
 		}
 	}
-
 }
