@@ -10,12 +10,12 @@
 #include <vector>
 #include <algorithm>
 
-#define BetterDaedalusExternal(function) new BetterDaedalusExternals::DaedalusExternal<#function,function>{}
-#define BetterDaedalusExternalWithCondition(function, condition) new BetterDaedalusExternals::DaedalusExternal<#function,function,condition>{}
+#define BetterDaedalusExternal(function) BetterDaedalusExternals::DaedalusExternal<#function,function>
+#define BetterDaedalusExternalWithCondition(function, condition) BetterDaedalusExternals::DaedalusExternal<#function,function,condition>
 
 #define BetterExternalDefinition(parserEnum, ...)\
 namespace BetterDaedalusExternals{\
-inline const ExternalTable g_externalTable_##parserEnum{ eParser::parserEnum, __VA_ARGS__ }; \
+inline const ExternalTable<__VA_ARGS__> g_externalTable_##parserEnum{ eParser::parserEnum }; \
 template<> struct ExternalTableGuard<eParser::parserEnum> {};\
 }\
 
@@ -419,8 +419,7 @@ namespace GOTHIC_ENGINE
 
 		struct BaseExternal
 		{
-			virtual void DefineExternal(zCParser* const t_parser) const = 0;
-			virtual ~BaseExternal() {};
+			static void DefineExternal(zCParser* const t_parser) {}
 
 			inline static zSTRING* nameBuffer = []()
 				{
@@ -458,7 +457,7 @@ namespace GOTHIC_ENGINE
 			static constexpr NameType s_name = Name;
 			static constexpr CallableType s_callable = Callable;
 
-			static bool Condition()
+			static constexpr bool Condition()
 			{
 				if constexpr (!std::is_same_v<decltype(ConditionFunc), std::nullptr_t>)
 				{
@@ -472,7 +471,7 @@ namespace GOTHIC_ENGINE
 
 			static int __cdecl Definition()
 			{
-				[currentParser = zCParser::cur_parser] <std::size_t... Is>(std::index_sequence<Is...>) [[msvc::forceinline]]
+					[currentParser = zCParser::cur_parser] <std::size_t... Is>(std::index_sequence<Is...>) [[msvc::forceinline]]
 					{
 						if constexpr (CallableInfo::HasReturn)
 						{
@@ -500,7 +499,7 @@ namespace GOTHIC_ENGINE
 					return 0;
 			}
 
-			virtual void DefineExternal(zCParser* const t_parser) const
+			static void DefineExternal(zCParser* const t_parser)
 			{
 				if (!Condition())
 				{
@@ -524,9 +523,6 @@ namespace GOTHIC_ENGINE
 				}
 			}
 
-			~DaedalusExternal() override
-			{
-			}
 		};
 
 		template<typename T1, typename T2>
@@ -546,14 +542,14 @@ namespace GOTHIC_ENGINE
 
 		struct BaseExternalTable
 		{
-			BaseExternalTable()
+			constexpr BaseExternalTable()
 			{
 				s_tables.push_back(this);
 			}
 
-			virtual ~BaseExternalTable() {};
+			constexpr virtual ~BaseExternalTable() {};
 
-			virtual void Define() const = 0;
+			constexpr virtual void Define() const = 0;
 
 			static void DefineAll()
 			{
@@ -566,37 +562,30 @@ namespace GOTHIC_ENGINE
 			inline static std::vector<BaseExternalTable*> s_tables;
 		};
 
+		template<typename...Args>
+			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal, Args...>)
+		using ExternalsTuple = std::tuple<Args...>;
+
 		template<typename... Args>
-			requires (are_externals_unique_v<Args...>&& are_base_of_v<BaseExternal, Args...>)
 		struct ExternalTable final : public BaseExternalTable
 		{
-			ExternalTable(const eParser t_parserEnum, Args*... t_args)
+			using Table = ExternalsTuple<Args...>;
+			
+			constexpr ExternalTable(const eParser t_parserEnum)
 				: m_parser(GetParserByEnum(t_parserEnum))
 
 			{
-				((m_externals.push_back(t_args)), ...);
 			}
 
-			void Define() const override
+			constexpr void Define() const override
 			{
-				for (const auto& ext : m_externals)
+				[&] <std::size_t... Is>(std::index_sequence<Is...>)
 				{
-					ext->DefineExternal(m_parser);
-				}
+					((std::tuple_element_t<Is, Table>::DefineExternal(m_parser)), ...);
+				}(std::make_index_sequence<std::tuple_size_v<Table>>{});
 
 			}
 
-			~ExternalTable() override
-			{
-				for (auto ptr : m_externals)
-				{
-					delete ptr;
-				}
-
-				m_externals.clear();
-			}
-
-			std::vector<BaseExternal*> m_externals;
 			zCParser* m_parser;
 
 
