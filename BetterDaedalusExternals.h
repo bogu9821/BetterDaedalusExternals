@@ -14,7 +14,7 @@
 #define BetterDaedalusExternalWithCondition(function, condition) new BetterDaedalusExternals::DaedalusExternal<#function,function,condition>{}
 
 #define BetterExternalDefinition(parserEnum, ...)\
-inline const BetterDaedalusExternals::ExternalTable g_externalTable_##parserEnum{ BetterDaedalusExternals::eParser::parserEnum, { __VA_ARGS__ } }; \
+inline const BetterDaedalusExternals::ExternalTable g_externalTable_##parserEnum{ BetterDaedalusExternals::eParser::parserEnum, __VA_ARGS__ }; \
 template<> struct BetterDaedalusExternals::ExternalTableGuard<BetterDaedalusExternals::eParser::parserEnum> {}\
 
 
@@ -497,24 +497,29 @@ namespace GOTHIC_ENGINE
 			}
 		};
 
-		struct ExternalTable
+		template<typename T1, typename T2>
+		constexpr bool ExternalSameAs()
 		{
-			ExternalTable(const eParser t_parserEnum, std::vector<BaseExternal*> t_externals)
-				:m_parser(GetParserByEnum(t_parserEnum)),
-				m_externals(std::move(t_externals))
+			return T1::s_name.Data() == T2::s_name.Data();
+		}
 
+		template<typename T, typename... Types>
+		constexpr bool are_externals_unique_v = ((!ExternalSameAs<T, Types>()) && ...) && are_externals_unique_v<Types...>;
+
+		template<typename T>
+		constexpr bool are_externals_unique_v<T> = true;
+
+		template <typename T, typename... Ts>
+		constexpr bool are_base_of_v = (std::is_base_of_v<T, Ts> && ...);
+
+		struct BaseExternalTable
+		{
+			BaseExternalTable()
 			{
 				s_tables.push_back(this);
 			}
 
-			void Define() const
-			{
-				for (const auto& ext : m_externals)
-				{
-					ext->DefineExternal(m_parser);
-				}
-
-			}
+			virtual void Define() const = 0;
 
 			static void DefineAll()
 			{
@@ -522,6 +527,29 @@ namespace GOTHIC_ENGINE
 				{
 					table->Define();
 				}
+			}
+			
+			inline static std::vector<BaseExternalTable*> s_tables;
+		};
+
+		template<typename... Args>
+			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal, Args...>)
+		struct ExternalTable : public BaseExternalTable
+		{
+			ExternalTable(const eParser t_parserEnum, Args*... t_args)
+				: m_parser(GetParserByEnum(t_parserEnum))
+
+			{
+				((m_externals.push_back(t_args)),...);
+			}
+
+			void Define() const override
+			{
+				for (const auto& ext : m_externals)
+				{
+					ext->DefineExternal(m_parser);
+				}
+
 			}
 
 			~ExternalTable()
@@ -537,7 +565,7 @@ namespace GOTHIC_ENGINE
 			std::vector<BaseExternal*> m_externals;
 			zCParser* m_parser;
 
-			inline static std::vector<ExternalTable*> s_tables;
+			
 		};
 
 
@@ -554,7 +582,7 @@ namespace GOTHIC_ENGINE
 
 		void DefineExternals()
 		{
-			ExternalTable::DefineAll();
+			BaseExternalTable::DefineAll();
 		}
 
 		void __fastcall oCGame__DefineExternals_Ulfi(oCGame* t_this, void* t_reg, zCParser* t_parser)
