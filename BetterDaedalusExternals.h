@@ -10,18 +10,18 @@
 #include <vector>
 #include <algorithm>
 
-#define BetterDaedalusExternal(function) new Externals::DaedalusExternal<#function,function>{}
-#define BetterDaedalusExternalWithCondition(function, condition) new Externals::DaedalusExternal<#function,function,condition>{}
+#define BetterDaedalusExternal(function) new BetterDaedalusExternals::DaedalusExternal<#function,function>{}
+#define BetterDaedalusExternalWithCondition(function, condition) new BetterDaedalusExternals::DaedalusExternal<#function,function,condition>{}
 
 #define BetterExternalDefinition(parserEnum, ...)\
-inline const Externals::ExternalTable g_externalTable_##parserEnum{ eParser::parserEnum, { __VA_ARGS__ } }; \
-template<> struct Externals::ExternalTableGuard<eParser::parserEnum> {}\
+inline const BetterDaedalusExternals::ExternalTable g_externalTable_##parserEnum{ BetterDaedalusExternals::eParser::parserEnum, { __VA_ARGS__ } }; \
+template<> struct BetterDaedalusExternals::ExternalTableGuard<BetterDaedalusExternals::eParser::parserEnum> {}\
 
 
 namespace GOTHIC_ENGINE
 {
-	namespace Externals
-	{	
+	namespace BetterDaedalusExternals
+	{
 		enum class eParser
 		{
 			GAME,
@@ -249,12 +249,12 @@ namespace GOTHIC_ENGINE
 			inline static Container s_objects;
 		};
 
-		
-		struct DaedalusFunction 
+
+		struct DaedalusFunction
 		{
 			int m_index{ -1 };
 		};
-		
+
 		template<typename T>
 		concept ScriptData =
 			std::is_same_v<std::decay_t<T>, int>
@@ -271,8 +271,8 @@ namespace GOTHIC_ENGINE
 			|| std::is_same_v<T, zSTRING>
 			|| std::is_same_v<T, void>
 			|| (std::is_pointer_v<std::decay_t<T>> && !std::is_pointer_v<std::remove_pointer_t<T>>);
-		
-		
+
+
 		inline static constexpr zCParser* GetParserByEnum(const eParser t_enum)
 		{
 			switch (t_enum)
@@ -362,7 +362,7 @@ namespace GOTHIC_ENGINE
 		{
 		public:
 
-			StringPool(const KeyType& t_key) : MappedBase(t_key){}
+			StringPool(const KeyType& t_key) : MappedBase(t_key) {}
 
 			zSTRING& GetNewString()
 			{
@@ -408,7 +408,7 @@ namespace GOTHIC_ENGINE
 					return new zSTRING;
 
 				}();
-			
+
 		};
 
 
@@ -425,7 +425,7 @@ namespace GOTHIC_ENGINE
 
 			using CallableInfo = FunctionTraits<std::conditional_t<IsFunctionPointer, CallableType, decltype(+Callable)>>;
 			using ReturnType = CallableInfo::ReturnType;
-	
+
 
 			static constexpr NameType s_name = Name;
 			static constexpr CallableType s_callable = Callable;
@@ -496,13 +496,13 @@ namespace GOTHIC_ENGINE
 				}
 			}
 		};
-	
+
 		struct ExternalTable
 		{
 			ExternalTable(const eParser t_parserEnum, std::vector<BaseExternal*> t_externals)
 				:m_parser(GetParserByEnum(t_parserEnum)),
 				m_externals(std::move(t_externals))
-				
+
 			{
 				s_tables.push_back(this);
 			}
