@@ -63,6 +63,7 @@ zSTRING GetHeroName()
 BetterExternalDefinition(GAME,
 	BetterDaedalusExternal(EXT_Log_GetTopicStatus),
 	BetterDaedalusExternal(GetHeroName),
+	//external is added to a parser only if condition is meet
 	BetterDaedalusExternalWithCondition(Npc_DoTakeItem, []() -> bool { return (rand() % 2) == 1; })
 );
 
