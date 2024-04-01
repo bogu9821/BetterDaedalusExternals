@@ -413,6 +413,7 @@ namespace GOTHIC_ENGINE
 
 
 		template<FixedStr Name, auto Callable, auto ConditionFunc = nullptr>
+			requires(Name.Data()[0] != '[')
 		struct DaedalusExternal final : public BaseExternal
 		{
 			using CallableType = decltype(Callable);
