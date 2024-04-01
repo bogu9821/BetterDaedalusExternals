@@ -11,20 +11,7 @@ The name of the external function will be taken from the name of the function/la
 **Requires C++23 and is designed to work with Union 1.0m SDK.**
 
 # Example
-To ensure everything works properly, make sure to include BetterExternals.h in your project and place your external header before ExternalsDefinition.h in that file due to constexpr checks.
 
-BetterExternals.h:
-```cpp
-#include "ExternalUtility.h"
-#include "Externals.h"
-
-//include your files here
-//e.g.
-//#include "MyExternals.h"
-
-#include "ExternalsDefinition.h"
-```
-Your code e.g.in MyExternals.h
 ```cpp
 int EXT_Log_GetTopicStatus(const zSTRING& t_topicName)
 {
@@ -78,13 +65,14 @@ zSTRING GetHeroName()
 	return player->name[0];
 }
 
-ExternalDefinition(eParser::GAME,
-	MakeDaedalusExternal(EXT_Log_GetTopicStatus),
-	MakeDaedalusExternal(GetHeroName),
-	MakeDaedalusExternalWithCondition(Npc_DoTakeItem, []() -> bool { return (rand() % 2) == 1; })
-)
+BetterExternalDefinition(GAME,
+	BetterDaedalusExternal(EXT_Log_GetTopicStatus),
+	BetterDaedalusExternal(GetHeroName),
+	BetterDaedalusExternalWithCondition(Npc_DoTakeItem, []() -> bool { return (rand() % 2) == 1; })
+);
 
-ExternalDefinition(eParser::MENU, MakeDaedalusExternal(EXT_RGBA))
+BetterExternalDefinition(MENU, BetterDaedalusExternal(EXT_RGBA));
+
 ```
 
 # How it looked before
