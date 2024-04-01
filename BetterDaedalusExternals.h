@@ -566,7 +566,7 @@ namespace GOTHIC_ENGINE
 		void __fastcall zCPar_DataStack__Clear(zCPar_DataStack* t_this, void* t_reg)
 		{
 			Hook_zCPar_DataStack__Clear(t_this, t_reg);
-			Externals::StringPool::ClearPool(t_this);
+			StringPool::ClearPool(t_this);
 		}
 	}
 
