@@ -420,6 +420,7 @@ namespace GOTHIC_ENGINE
 		struct BaseExternal
 		{
 			virtual void DefineExternal(zCParser* const t_parser) const = 0;
+			virtual ~BaseExternal() {};
 
 			inline static zSTRING* nameBuffer = []()
 				{
@@ -522,6 +523,10 @@ namespace GOTHIC_ENGINE
 					t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, ReturnToEnum<std::decay_t<ReturnType>>(), 0);
 				}
 			}
+
+			~DaedalusExternal() override
+			{
+			}
 		};
 
 		template<typename T1, typename T2>
@@ -545,6 +550,8 @@ namespace GOTHIC_ENGINE
 			{
 				s_tables.push_back(this);
 			}
+
+			virtual ~BaseExternalTable() {};
 
 			virtual void Define() const = 0;
 
@@ -579,7 +586,7 @@ namespace GOTHIC_ENGINE
 
 			}
 
-			~ExternalTable()
+			~ExternalTable() override
 			{
 				for (auto ptr : m_externals)
 				{
