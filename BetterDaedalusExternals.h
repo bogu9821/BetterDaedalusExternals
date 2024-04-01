@@ -393,7 +393,7 @@ namespace GOTHIC_ENGINE
 
 		struct BaseExternal
 		{
-			virtual void DefineExternal([[maybe_unused]] zCParser* const t_parser) const {}
+			virtual void DefineExternal(zCParser* const t_parser) const = 0;
 
 			inline static zSTRING* nameBuffer = []()
 				{
