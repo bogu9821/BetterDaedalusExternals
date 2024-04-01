@@ -413,7 +413,7 @@ namespace GOTHIC_ENGINE
 
 
 		template<FixedStr Name, auto Callable, auto ConditionFunc = nullptr>
-		struct DaedalusExternal : public BaseExternal
+		struct DaedalusExternal final : public BaseExternal
 		{
 			using CallableType = decltype(Callable);
 			using NameType = decltype(Name);
@@ -534,7 +534,7 @@ namespace GOTHIC_ENGINE
 
 		template<typename... Args>
 			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal, Args...>)
-		struct ExternalTable : public BaseExternalTable
+		struct ExternalTable final : public BaseExternalTable
 		{
 			ExternalTable(const eParser t_parserEnum, Args*... t_args)
 				: m_parser(GetParserByEnum(t_parserEnum))
