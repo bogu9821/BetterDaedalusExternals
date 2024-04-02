@@ -8,8 +8,6 @@ zSTRINGs can be also taken from the stack as const references, eliminating the n
 The name of the external function will be taken from the name of the function/lambda.<br>
 Compile time errors occur if you attempt to redefine an external.<br>
 
-**NOTE: there can only be 1 table instance of a given parser.**
-
 **Requires C++23 and is designed to work with Union 1.0m SDK.**
 
 # Example
