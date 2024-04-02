@@ -29,6 +29,7 @@ inline const BetterDaedalusExternals::ExternalTable<__VA_ARGS__> BDE_MACRO_CONCA
 
 #define BetterExternalDefinition(parserEnum, ...)\
 inline const BetterDaedalusExternals::ExternalTable<__VA_ARGS__>  g_externalTable_##parserEnum { BetterDaedalusExternals::eParser::parserEnum };\
+namespace BetterDaedalusExternals { template<> struct ExternalTableGuard<eParser::parserEnum> {}; }\
 
 #endif
 
