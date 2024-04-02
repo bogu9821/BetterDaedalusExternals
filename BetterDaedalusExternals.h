@@ -592,9 +592,9 @@ namespace GOTHIC_ENGINE
 
 			constexpr void Define() const override
 			{
-				[&] <std::size_t... Is>(std::index_sequence<Is...>)
+				[par = m_parser] <std::size_t... Is>(std::index_sequence<Is...>)
 				{
-					((std::tuple_element_t<Is, Table>::DefineExternal(m_parser)), ...);
+					((std::tuple_element_t<Is, Table>::DefineExternal(par)), ...);
 				}(std::make_index_sequence<std::tuple_size_v<Table>>{});
 
 			}
