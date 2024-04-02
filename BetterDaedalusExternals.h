@@ -10,18 +10,13 @@
 #include <vector>
 #include <algorithm>
 
-#ifndef BDE_USE_COUNTER
-#define BDE_USE_COUNTER 0
-#endif
-
 #define BetterDaedalusExternal(function) BetterDaedalusExternals::DaedalusExternal<#function,function>
 #define BetterDaedalusExternalWithCondition(function, condition) BetterDaedalusExternals::DaedalusExternal<#function,function,condition>
 
 #define BDE_CONCAT_IMPL( x, y ) x##y
 #define BDE_MACRO_CONCAT( x, y ) BDE_CONCAT_IMPL( x, y )
 
-
-#if BDE_USE_COUNTER == 1
+#ifdef BDE_USE_COUNTER
 #define BetterExternalDefinition(parserEnum, ...)\
 inline const BetterDaedalusExternals::ExternalTable<__VA_ARGS__> BDE_MACRO_CONCAT(g_externalTable_, BDE_MACRO_CONCAT(parserEnum,__COUNTER__)) { BetterDaedalusExternals::eParser::parserEnum };\
 
@@ -583,7 +578,7 @@ namespace GOTHIC_ENGINE
 		struct ExternalTable final : public BaseExternalTable
 		{
 			using Table = ExternalsTuple<Args...>;
-			
+
 			constexpr ExternalTable(const eParser t_parserEnum)
 				: m_parser(GetParserByEnum(t_parserEnum))
 
