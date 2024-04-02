@@ -10,7 +10,7 @@ Compile time errors occur if you attempt to redefine an external.<br>
 
 **Requires C++23 and is designed to work with Union 1.0m SDK.**
 
-**By default only one table of specific parser can be declared. If you want to declare multiple same parser tables, define BDE_USE_COUNTER macro. __COUNTER__ will be used to create unique table names. This may be compiler dependent and it is experimental. With this option you can't get compile time redefinition error across different tables. Original runtime error will occur.**
+**By default only one table of specific parser can be declared. If you want to declare multiple same parser tables, define BDE_USE_COUNTER macro. `__COUNTER__` will be used to create unique table names. This may be compiler dependent and it is experimental. With this option you can't get compile time redefinition error across different tables. Original runtime error will occur.**
 
 # Example
 Include BetterDaedalusExternals.h and use macros for externals definition e.g.
