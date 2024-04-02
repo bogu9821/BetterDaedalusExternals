@@ -11,7 +11,7 @@
 #include <algorithm>
 
 #ifndef BDE_USE_COUNTER
-#define BDE_USE_COUNTER 1
+#define BDE_USE_COUNTER 0
 #endif
 
 #define BetterDaedalusExternal(function) BetterDaedalusExternals::DaedalusExternal<#function,function>
