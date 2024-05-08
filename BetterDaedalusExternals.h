@@ -124,7 +124,7 @@ namespace GOTHIC_ENGINE
 			[[nodiscard]]
 			constexpr size_t Size() const noexcept
 			{
-				return Size;
+				return N;
 			}
 
 			[[nodiscard]]
