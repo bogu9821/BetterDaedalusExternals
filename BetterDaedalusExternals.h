@@ -427,22 +427,7 @@ namespace GOTHIC_ENGINE
 
 		struct BaseExternal
 		{
-			static void DefineExternal(zCParser* const t_parser) {}
-
-			inline static zSTRING* nameBuffer = []()
-				{
-					if constexpr (MpBuild())
-					{
-						if (Union.GetEngineVersion() != ENGINE)
-						{
-							return nullptr;
-						}
-					}
-
-					return new zSTRING;
-
-				}();
-
+			static void DefineExternal(const auto& t_table) {}
 		};
 
 
@@ -479,7 +464,7 @@ namespace GOTHIC_ENGINE
 
 			static int __cdecl Definition()
 			{
-					[currentParser = zCParser::cur_parser] <std::size_t... Is>(std::index_sequence<Is...>) [[msvc::forceinline]]
+				[currentParser = zCParser::cur_parser] <std::size_t... Is>(std::index_sequence<Is...>) [[msvc::forceinline]]
 					{
 						if constexpr (CallableInfo::HasReturn)
 						{
@@ -507,27 +492,29 @@ namespace GOTHIC_ENGINE
 					return 0;
 			}
 
-			static void DefineExternal(zCParser* const t_parser)
+			static void DefineExternal(const auto& t_table)
 			{
 				if (!Condition())
 				{
 					return;
 				}
 
-				*BaseExternal::nameBuffer = Name.Data().data();
+				t_table.m_nameBuffer = Name.Data().data();
+
+				auto const par = t_table.m_parser;
 
 				if constexpr (CallableInfo::ArgCount != 0)
 				{
-					[t_parser] <std::size_t... Is>(std::index_sequence<Is...>)
+					[&] <std::size_t... Is>(std::index_sequence<Is...>)
 					{
-						t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, ReturnToEnum<std::decay_t<ReturnType>>(), TypeToEnum<std::decay_t<std::tuple_element_t<Is, typename CallableInfo::ArgTypes>>>()..., 0);
+						par->DefineExternal(t_table.m_nameBuffer, &Definition, ReturnToEnum<std::decay_t<ReturnType>>(), TypeToEnum<std::decay_t<std::tuple_element_t<Is, typename CallableInfo::ArgTypes>>>()..., 0);
 
 					}(std::make_index_sequence<CallableInfo::ArgCount>());
 
 				}
 				else
 				{
-					t_parser->DefineExternal(*BaseExternal::nameBuffer, &Definition, ReturnToEnum<std::decay_t<ReturnType>>(), 0);
+					par->DefineExternal(t_table.m_nameBuffer, &Definition, ReturnToEnum<std::decay_t<ReturnType>>(), 0);
 				}
 			}
 
@@ -571,7 +558,7 @@ namespace GOTHIC_ENGINE
 		};
 
 		template<typename...Args>
-			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal, Args...>)
+			requires (are_externals_unique_v<Args...>&& are_base_of_v<BaseExternal, Args...>)
 		using ExternalsTuple = std::tuple<Args...>;
 
 		template<typename... Args>
@@ -587,15 +574,15 @@ namespace GOTHIC_ENGINE
 
 			constexpr void Define() const override
 			{
-				[par = m_parser] <std::size_t... Is>(std::index_sequence<Is...>)
+				[&] <std::size_t... Is>(std::index_sequence<Is...>)
 				{
-					((std::tuple_element_t<Is, Table>::DefineExternal(par)), ...);
+					((std::tuple_element_t<Is, Table>::DefineExternal(*this)), ...);
 				}(std::make_index_sequence<std::tuple_size_v<Table>>{});
 
 			}
 
 			zCParser* m_parser;
-
+			mutable zSTRING m_nameBuffer;
 
 		};
 
