@@ -58,14 +58,14 @@ zSTRING GetHeroName()
 	return player->name[0];
 }
 
-BetterExternalDefinition(GAME,
+BetterExternalDefinition(parser,
 	BetterDaedalusExternal(EXT_Log_GetTopicStatus),
 	BetterDaedalusExternal(GetHeroName),
 	//external is added to a parser only if condition is meet
 	BetterDaedalusExternalWithCondition(Npc_DoTakeItem, []() -> bool { return (rand() % 2) == 1; })
 );
 
-BetterExternalDefinition(MENU, BetterDaedalusExternal(EXT_RGBA));
+BetterExternalDefinition(parserMenu, BetterDaedalusExternal(EXT_RGBA));
 
 ```
 

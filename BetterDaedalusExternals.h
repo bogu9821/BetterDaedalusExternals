@@ -13,25 +13,13 @@
 #define BetterDaedalusExternal(function) BetterDaedalusExternals::DaedalusExternal<#function,function>
 #define BetterDaedalusExternalWithCondition(function, condition) BetterDaedalusExternals::DaedalusExternal<#function,function,condition>
 
-#define BetterExternalDefinition(parserEnum, ...)\
-inline const BetterDaedalusExternals::ExternalTable<__VA_ARGS__>  g_externalTable_##parserEnum { BetterDaedalusExternals::eParser::parserEnum };\
-namespace BetterDaedalusExternals { template<> struct ExternalTableGuard<eParser::parserEnum> {}; }\
+#define BetterExternalDefinition(parserPointer, ...)\
+inline const BetterDaedalusExternals::ExternalTable<__VA_ARGS__>  g_externalTable_##parserPointer { parserPointer };\
 
 namespace GOTHIC_ENGINE
 {
 	namespace BetterDaedalusExternals
 	{
-		enum class eParser
-		{
-			GAME,
-			MENU,
-			MUSIC,
-			SFX,
-			PFX,
-			VFX,
-			MAX
-		};
-
 		constexpr bool MpBuild()
 		{
 #if (defined(__G1) + defined(__G1A) + defined(__G2) + defined(__G2A)) > 1
@@ -269,36 +257,6 @@ namespace GOTHIC_ENGINE
 			|| std::is_same_v<T, zSTRING>
 			|| std::is_same_v<T, void>
 			|| (std::is_pointer_v<std::decay_t<T>> && !std::is_pointer_v<std::remove_pointer_t<T>>);
-
-
-		inline static constexpr zCParser* GetParserByEnum(const eParser t_enum)
-		{
-			switch (t_enum)
-			{
-			case eParser::GAME:
-				return parser;
-
-			case eParser::MUSIC:
-				return parserMusic;
-
-			case eParser::SFX:
-				return parserSoundFX;
-
-			case eParser::PFX:
-				return parserParticleFX;
-
-			case eParser::VFX:
-				return parserParticleFX;
-
-			case eParser::MENU:
-				return parserVisualFX;
-
-			case eParser::MAX:
-				std::unreachable();
-			}
-
-			return {};
-		}
 
 
 		template<ScriptData T>
@@ -555,8 +513,8 @@ namespace GOTHIC_ENGINE
 		{
 			using Table = ExternalsTuple<Args...>;
 
-			constexpr ExternalTable(const eParser t_parserEnum)
-				: m_parser(GetParserByEnum(t_parserEnum))
+			constexpr ExternalTable(zCParser* const t_parser)
+				: m_parser(t_parser)
 
 			{
 			}
@@ -574,12 +532,6 @@ namespace GOTHIC_ENGINE
 			mutable zSTRING m_nameBuffer;
 
 		};
-
-		template<eParser Parser>
-		struct ExternalTableGuard
-		{
-		};
-
 
 		void __fastcall zCPar_DataStack__Clear(zCPar_DataStack* t_this, void* t_reg);
 		inline HOOK Hook_zCPar_DataStack__Clear PATCH(&zCPar_DataStack::Clear, &zCPar_DataStack__Clear);
