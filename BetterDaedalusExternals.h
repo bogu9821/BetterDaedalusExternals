@@ -13,20 +13,9 @@
 #define BetterDaedalusExternal(function) BetterDaedalusExternals::DaedalusExternal<#function,function>
 #define BetterDaedalusExternalWithCondition(function, condition) BetterDaedalusExternals::DaedalusExternal<#function,function,condition>
 
-#define BDE_CONCAT_IMPL( x, y ) x##y
-#define BDE_MACRO_CONCAT( x, y ) BDE_CONCAT_IMPL( x, y )
-
-#ifdef BDE_USE_COUNTER
-#define BetterExternalDefinition(parserEnum, ...)\
-inline const BetterDaedalusExternals::ExternalTable<__VA_ARGS__> BDE_MACRO_CONCAT(g_externalTable_, BDE_MACRO_CONCAT(parserEnum,__COUNTER__)) { BetterDaedalusExternals::eParser::parserEnum };\
-
-#else
-
 #define BetterExternalDefinition(parserEnum, ...)\
 inline const BetterDaedalusExternals::ExternalTable<__VA_ARGS__>  g_externalTable_##parserEnum { BetterDaedalusExternals::eParser::parserEnum };\
 namespace BetterDaedalusExternals { template<> struct ExternalTableGuard<eParser::parserEnum> {}; }\
-
-#endif
 
 namespace GOTHIC_ENGINE
 {
