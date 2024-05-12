@@ -61,7 +61,7 @@ namespace GOTHIC_ENGINE
 			static inline constexpr char CharToUpperSimple(const char t_char)
 			{
 				return t_char >= 'a' && t_char <= 'z'
-					? static_cast<char>(static_cast<unsigned char>(t_char) - ('a' + 'A'))
+					? static_cast<char>(static_cast<unsigned char>(t_char) - ('a' - 'A'))
 					: t_char;
 			}
 
