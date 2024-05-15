@@ -1,6 +1,6 @@
 // Supported with union (c) 2020 Union team
 // Union HEADER file
-#include <list>
+#include <forward_list>
 #include <concepts>
 #include <list>
 #include <string_view>
@@ -347,7 +347,7 @@ namespace GOTHIC_ENGINE
 
 			zSTRING& GetNewString()
 			{
-				return m_strings.emplace_back();
+				return m_strings.emplace_front();
 			}
 
 			void ClearPool()
@@ -369,7 +369,7 @@ namespace GOTHIC_ENGINE
 			}
 
 		private:
-			std::list<zSTRING> m_strings;
+			std::forward_list<zSTRING> m_strings;
 		};
 
 		struct BaseExternal
@@ -489,7 +489,7 @@ namespace GOTHIC_ENGINE
 				s_tables.push_back(this);
 			}
 
-			constexpr virtual ~BaseExternalTable() {};
+			constexpr virtual ~BaseExternalTable() = default;
 
 			constexpr virtual void Define() const = 0;
 
@@ -505,7 +505,7 @@ namespace GOTHIC_ENGINE
 		};
 
 		template<typename...Args>
-			requires (are_externals_unique_v<Args...>&& are_base_of_v<BaseExternal, Args...>)
+			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal, Args...>)
 		using ExternalsTuple = std::tuple<Args...>;
 
 		template<typename... Args>
