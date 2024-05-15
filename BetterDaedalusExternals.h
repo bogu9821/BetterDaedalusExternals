@@ -345,7 +345,7 @@ namespace GOTHIC_ENGINE
 
 			StringPool(const KeyType& t_key) : MappedBase(t_key) {}
 
-			zSTRING& GetNewString()
+			[[nodiscard]] zSTRING& GetNewString()
 			{
 				return m_strings.emplace_front();
 			}
