@@ -9,6 +9,7 @@
 #include <ranges>
 #include <vector>
 #include <algorithm>
+#include <type_traits>
 
 #define BetterDaedalusExternal(function) BetterDaedalusExternals::DaedalusExternal<#function,function>
 #define BetterDaedalusExternalWithCondition(function, condition) BetterDaedalusExternals::DaedalusExternal<#function,function,condition>
@@ -345,7 +346,7 @@ namespace GOTHIC_ENGINE
 
 			StringPool(const KeyType& t_key) : MappedBase(t_key) {}
 
-			[[nodiscard]] zSTRING& GetNewString()
+			[[nodiscard]] std::reference_wrapper<zSTRING> GetNewString()
 			{
 				return m_strings.emplace_front();
 			}
@@ -418,9 +419,9 @@ namespace GOTHIC_ENGINE
 							[[msvc::flatten]]
 							if constexpr (std::is_same_v<std::decay_t<ReturnType>, zSTRING>)
 							{
-								auto& str = StringPool::Get(currentParser).GetNewString();
-								str = Callable(GetData<std::decay_t<std::tuple_element_t<Is, CallableInfo::ArgTypes>>>(currentParser)...);
-								currentParser->SetReturn(str);
+								auto str = StringPool::Get(currentParser).GetNewString();
+								str.get() = Callable(GetData<std::decay_t<std::tuple_element_t<Is, CallableInfo::ArgTypes>>>(currentParser)...);
+								currentParser->SetReturn(&str);
 							}
 							else
 							{
@@ -505,7 +506,7 @@ namespace GOTHIC_ENGINE
 		};
 
 		template<typename...Args>
-			requires (are_externals_unique_v<Args...> && are_base_of_v<BaseExternal, Args...>)
+			requires (are_externals_unique_v<Args...>&& are_base_of_v<BaseExternal, Args...>)
 		using ExternalsTuple = std::tuple<Args...>;
 
 		template<typename... Args>
