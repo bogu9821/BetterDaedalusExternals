@@ -419,9 +419,9 @@ namespace GOTHIC_ENGINE
 							[[msvc::flatten]]
 							if constexpr (std::is_same_v<std::decay_t<ReturnType>, zSTRING>)
 							{
-								auto str = StringPool::Get(currentParser).GetNewString();
-								str.get() = Callable(GetData<std::decay_t<std::tuple_element_t<Is, CallableInfo::ArgTypes>>>(currentParser)...);
-								currentParser->SetReturn(&str);
+								auto& str = StringPool::Get(currentParser).GetNewString().get();
+								str = Callable(GetData<std::decay_t<std::tuple_element_t<Is, CallableInfo::ArgTypes>>>(currentParser)...);
+								currentParser->SetReturn(str);
 							}
 							else
 							{
